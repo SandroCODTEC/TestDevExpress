@@ -15,7 +15,6 @@ namespace DevExtremeAspNetCoreApp1.Models
 
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseMySql("server=177.12.174.20;database=codtec10;user=codtec12;pwd={password};");
             }
         }
     }
