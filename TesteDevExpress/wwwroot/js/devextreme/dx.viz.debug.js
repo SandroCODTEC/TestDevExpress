@@ -1,7 +1,7 @@
 /*!
  * DevExtreme (dx.viz.debug.js)
- * Version: 18.2.7
- * Build date: Sat Mar 09 2019
+ * Version: 18.2.7 (build 19091)
+ * Build date: Mon Apr 01 2019
  *
  * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -270,58 +270,66 @@
         } : function(obj) {
             return obj && "function" === typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj
         };
-        var config = __webpack_require__( /*! ../config */ 25),
-            deferredUtils = __webpack_require__( /*! ../utils/deferred */ 7),
-            when = deferredUtils.when,
-            Deferred = deferredUtils.Deferred,
-            each = __webpack_require__( /*! ./iterator */ 3).each,
-            toComparable = __webpack_require__( /*! ./data */ 22).toComparable,
-            typeUtils = __webpack_require__( /*! ./type */ 1);
+        var _config = __webpack_require__( /*! ../config */ 25);
+        var _config2 = _interopRequireDefault(_config);
+        var _guid = __webpack_require__( /*! ../guid */ 44);
+        var _guid2 = _interopRequireDefault(_guid);
+        var _deferred = __webpack_require__( /*! ../utils/deferred */ 7);
+        var _iterator = __webpack_require__( /*! ./iterator */ 3);
+        var _data = __webpack_require__( /*! ./data */ 22);
+        var _type = __webpack_require__( /*! ./type */ 1);
+
+        function _interopRequireDefault(obj) {
+            return obj && obj.__esModule ? obj : {
+                "default": obj
+            }
+        }
         var ensureDefined = function(value, defaultValue) {
-            return typeUtils.isDefined(value) ? value : defaultValue
+            return (0, _type.isDefined)(value) ? value : defaultValue
         };
         var executeAsync = function(action, context) {
-            var timerId, deferred = new Deferred,
-                normalizedContext = context || this,
-                task = {
-                    promise: deferred.promise(),
-                    abort: function() {
-                        clearTimeout(timerId);
-                        deferred.rejectWith(normalizedContext)
-                    }
-                },
-                callback = function() {
-                    var result = action.call(normalizedContext);
-                    if (result && result.done && typeUtils.isFunction(result.done)) {
-                        result.done(function() {
-                            deferred.resolveWith(normalizedContext)
-                        })
-                    } else {
+            var deferred = new _deferred.Deferred;
+            var normalizedContext = context || this;
+            var timerId = void 0;
+            var task = {
+                promise: deferred.promise(),
+                abort: function() {
+                    clearTimeout(timerId);
+                    deferred.rejectWith(normalizedContext)
+                }
+            };
+            var callback = function() {
+                var result = action.call(normalizedContext);
+                if (result && result.done && (0, _type.isFunction)(result.done)) {
+                    result.done(function() {
                         deferred.resolveWith(normalizedContext)
-                    }
-                };
+                    })
+                } else {
+                    deferred.resolveWith(normalizedContext)
+                }
+            };
             timerId = (arguments[2] || setTimeout)(callback, "number" === typeof context ? context : 0);
             return task
         };
         var delayedFuncs = [];
         var delayedNames = [];
         var delayedDeferreds = [];
-        var executingName;
+        var executingName = void 0;
         var deferExecute = function(name, func, deferred) {
             if (executingName && executingName !== name) {
                 delayedFuncs.push(func);
                 delayedNames.push(name);
-                deferred = deferred || new Deferred;
+                deferred = deferred || new _deferred.Deferred;
                 delayedDeferreds.push(deferred);
                 return deferred
             } else {
-                var oldExecutingName = executingName,
-                    currentDelayedCount = delayedDeferreds.length;
+                var oldExecutingName = executingName;
+                var currentDelayedCount = delayedDeferreds.length;
                 executingName = name;
                 var result = func();
                 if (!result) {
                     if (delayedDeferreds.length > currentDelayedCount) {
-                        result = when.apply(this, delayedDeferreds.slice(currentDelayedCount))
+                        result = _deferred.when.apply(this, delayedDeferreds.slice(currentDelayedCount))
                     } else {
                         if (deferred) {
                             deferred.resolve()
@@ -335,7 +343,7 @@
                 if (!executingName && delayedFuncs.length) {
                     ("render" === delayedNames.shift() ? deferRender : deferUpdate)(delayedFuncs.shift(), delayedDeferreds.shift())
                 }
-                return result || when()
+                return result || (0, _deferred.when)()
             }
         };
         var deferRender = function(func, deferred) {
@@ -361,12 +369,12 @@
             }
         };
         var findBestMatches = function(targetFilter, items, mapFn) {
-            var bestMatches = [],
-                maxMatchCount = 0;
-            each(items, function(index, itemSrc) {
-                var matchCount = 0,
-                    item = mapFn ? mapFn(itemSrc) : itemSrc;
-                each(targetFilter, function(paramName, targetValue) {
+            var bestMatches = [];
+            var maxMatchCount = 0;
+            (0, _iterator.each)(items, function(index, itemSrc) {
+                var matchCount = 0;
+                var item = mapFn ? mapFn(itemSrc) : itemSrc;
+                (0, _iterator.each)(targetFilter, function(paramName, targetValue) {
                     var value = item[paramName];
                     if (void 0 === value) {
                         return
@@ -392,7 +400,7 @@
         var match = function(value, targetValue) {
             if (Array.isArray(value) && Array.isArray(targetValue)) {
                 var mismatch = false;
-                each(value, function(index, valueItem) {
+                (0, _iterator.each)(value, function(index, valueItem) {
                     if (valueItem !== targetValue[index]) {
                         mismatch = true;
                         return false
@@ -421,9 +429,9 @@
             }
         };
         var normalizeKey = function(id) {
-            var key = typeUtils.isString(id) ? id : id.toString(),
-                arr = key.match(/[^a-zA-Z0-9_]/g);
-            arr && each(arr, function(_, sign) {
+            var key = (0, _type.isString)(id) ? id : id.toString();
+            var arr = key.match(/[^a-zA-Z0-9_]/g);
+            arr && (0, _iterator.each)(arr, function(_, sign) {
                 key = key.replace(sign, "__" + sign.charCodeAt() + "__")
             });
             return key
@@ -453,17 +461,17 @@
                     return false
                 }
             }
-            for (propertyName in object2) {
-                if (!(propertyName in object1)) {
+            for (var _propertyName in object2) {
+                if (!(_propertyName in object1)) {
                     return false
                 }
             }
             return true
         };
         var pairToObject = function(raw) {
-            var pair = splitPair(raw),
-                h = parseInt(pair && pair[0], 10),
-                v = parseInt(pair && pair[1], 10);
+            var pair = splitPair(raw);
+            var h = parseInt(pair && pair[0], 10);
+            var v = parseInt(pair && pair[1], 10);
             if (!isFinite(h)) {
                 h = 0
             }
@@ -478,12 +486,12 @@
         var maxEqualityDeep = 3;
         var equalByValue = function(object1, object2, deep) {
             deep = deep || 0;
-            object1 = toComparable(object1, true);
-            object2 = toComparable(object2, true);
+            object1 = (0, _data.toComparable)(object1, true);
+            object2 = (0, _data.toComparable)(object2, true);
             if (object1 === object2 || deep >= maxEqualityDeep) {
                 return true
             }
-            if (typeUtils.isObject(object1) && typeUtils.isObject(object2)) {
+            if ((0, _type.isObject)(object1) && (0, _type.isObject)(object2)) {
                 return isObjectsEqualByValue(object1, object2, deep)
             } else {
                 if (Array.isArray(object1) && Array.isArray(object2)) {
@@ -493,12 +501,16 @@
             return false
         };
         var getKeyHash = function(key) {
-            if (typeUtils.isObject(key) || Array.isArray(key)) {
-                try {
-                    var keyHash = JSON.stringify(key);
-                    return "{}" === keyHash ? key : keyHash
-                } catch (e) {
-                    return key
+            if (key instanceof _guid2.default) {
+                return key.toString()
+            } else {
+                if ((0, _type.isObject)(key) || Array.isArray(key)) {
+                    try {
+                        var keyHash = JSON.stringify(key);
+                        return "{}" === keyHash ? key : keyHash
+                    } catch (e) {
+                        return key
+                    }
                 }
             }
             return key
@@ -507,19 +519,20 @@
             return string.replace(/[[\]{}\-()*+?.\\^$|\s]/g, "\\$&")
         };
         var applyServerDecimalSeparator = function(value) {
-            var separator = config().serverDecimalSeparator;
-            if (typeUtils.isDefined(value)) {
+            var separator = (0, _config2.default)().serverDecimalSeparator;
+            if ((0, _type.isDefined)(value)) {
                 value = value.toString().replace(".", separator)
             }
             return value
         };
         var noop = function() {};
         var asyncNoop = function() {
-            return (new Deferred).resolve().promise()
+            return (new _deferred.Deferred).resolve().promise()
         };
         var grep = function(elements, checkFunction, invert) {
-            var check, result = [],
-                expectedCheck = !invert;
+            var result = [];
+            var check = void 0;
+            var expectedCheck = !invert;
             for (var i = 0; i < elements.length; i++) {
                 check = !!checkFunction(elements[i], i);
                 if (check === expectedCheck) {
@@ -584,10 +597,7 @@
             focusout: "blur"
         };
         var NO_BUBBLE_EVENTS = ["blur", "focusout", "focus", "focusin", "load"];
-        var passiveListenerEvents = {
-            eventName: "dxpointermove",
-            nativeEventName: "touchmove"
-        };
+        var forcePassiveFalseEventNames = ["touchmove", "wheel", "mousewheel"];
         var matchesSafe = function(target, selector) {
             return !isWindow(target) && "#document" !== target.nodeName && domAdapter.elementMatches(target, selector)
         };
@@ -709,7 +719,7 @@
                     }
                     if (shouldAddNativeListener) {
                         eventData.nativeHandler = getNativeHandler(eventName);
-                        if (eventName === passiveListenerEvents.nativeEventName) {
+                        if (forcePassiveFalseEventNames.indexOf(eventName) > -1) {
                             nativeListenerOptions = {
                                 passive: false
                             }
@@ -1058,7 +1068,7 @@
                 })
             }))
         };
-        eventsEngine.passiveListenerEvents = passiveListenerEvents;
+        eventsEngine.forcePassiveFalseEventNames = forcePassiveFalseEventNames;
         eventsEngine.elementDataMap = elementDataMap;
         module.exports = eventsEngine
     },
@@ -1471,13 +1481,16 @@
             return 0
         };
         var needSkipEvent = function(e) {
-            var $target = (0, _renderer2.default)(e.target);
+            var target = e.target;
+            var $target = (0, _renderer2.default)(target);
             var touchInInput = $target.is("input, textarea, select");
             if ($target.is(".dx-skip-gesture-event *, .dx-skip-gesture-event")) {
                 return true
             }
             if ("dxmousewheel" === e.type) {
-                return $target.is("input[type='number'], textarea, select") && $target.is(":focus")
+                var isContentEditableFocused = target.isContentEditable && $target.closest("div[contenteditable='true']").is(":focus");
+                var isInputFocused = $target.is("input[type='number'], textarea, select") && $target.is(":focus");
+                return isInputFocused || isContentEditableFocused
             }
             if (isMouseEvent(e)) {
                 return touchInInput || e.which > 1
@@ -1797,11 +1810,11 @@
     /*! all exports used */
     function(module, exports, __webpack_require__) {
         var elementStrategy, $ = __webpack_require__( /*! ../../core/renderer */ 2),
+            config = __webpack_require__( /*! ../../core/config */ 25),
             domAdapter = __webpack_require__( /*! ../../core/dom_adapter */ 13),
             windowUtils = __webpack_require__( /*! ./window */ 6),
             window = windowUtils.getWindow(),
             eventsEngine = __webpack_require__( /*! ../../events/core/events_engine */ 5),
-            errors = __webpack_require__( /*! ../errors */ 19),
             inArray = __webpack_require__( /*! ./array */ 11).inArray,
             typeUtils = __webpack_require__( /*! ./type */ 1),
             isDefined = typeUtils.isDefined,
@@ -1864,16 +1877,8 @@
         }();
         var dataOptionsAttributeName = "data-options";
         var getElementOptions = function(element) {
-            var result, optionsString = $(element).attr(dataOptionsAttributeName) || "";
-            if ("{" !== optionsString.trim().charAt(0)) {
-                optionsString = "{" + optionsString + "}"
-            }
-            try {
-                result = new Function("return " + optionsString)()
-            } catch (ex) {
-                throw errors.Error("E3018", ex, optionsString)
-            }
-            return result
+            var optionsString = $(element).attr(dataOptionsAttributeName) || "";
+            return config().optionsParser(optionsString)
         };
         var createComponents = function(elements, componentTypes) {
             var result = [],
@@ -2133,7 +2138,7 @@
             dependencyInjector = __webpack_require__( /*! ../core/utils/dependency_injector */ 56),
             extend = __webpack_require__( /*! ../core/utils/extend */ 0).extend,
             each = __webpack_require__( /*! ../core/utils/iterator */ 3).each,
-            stringFormat = __webpack_require__( /*! ../core/utils/string */ 44).format,
+            stringFormat = __webpack_require__( /*! ../core/utils/string */ 45).format,
             humanize = __webpack_require__( /*! ../core/utils/inflector */ 32).humanize,
             coreLocalization = __webpack_require__( /*! ./core */ 86);
         __webpack_require__( /*! ./core */ 86);
@@ -2256,7 +2261,7 @@
             extend = __webpack_require__( /*! ../../core/utils/extend */ 0).extend,
             each = __webpack_require__( /*! ../../core/utils/iterator */ 3).each,
             adjust = __webpack_require__( /*! ../../core/utils/math */ 30).adjust,
-            dateToMilliseconds = __webpack_require__( /*! ../../core/utils/date */ 23).dateToMilliseconds,
+            dateToMilliseconds = __webpack_require__( /*! ../../core/utils/date */ 24).dateToMilliseconds,
             isDefined = typeUtils.isDefined,
             isNumber = typeUtils.isNumeric,
             isExponential = typeUtils.isExponential,
@@ -3907,6 +3912,137 @@
         exports.compileSetter = compileSetter;
         exports.toComparable = toComparable
     },
+    /*!******************************************************!*\
+      !*** ./artifacts/transpiled/animation/translator.js ***!
+      \******************************************************/
+    /*! dynamic exports provided */
+    /*! all exports used */
+    function(module, exports, __webpack_require__) {
+        var dataUtils = __webpack_require__( /*! ../core/element_data */ 38),
+            type = __webpack_require__( /*! ../core/utils/type */ 1).type;
+        var TRANSLATOR_DATA_KEY = "dxTranslator",
+            TRANSFORM_MATRIX_REGEX = /matrix(3d)?\((.+?)\)/,
+            TRANSLATE_REGEX = /translate(?:3d)?\((.+?)\)/;
+        var locate = function($element) {
+            var translate = getTranslate($element);
+            return {
+                left: translate.x,
+                top: translate.y
+            }
+        };
+        var move = function($element, position) {
+            var translate, left = position.left,
+                top = position.top;
+            if (void 0 === left) {
+                translate = getTranslate($element);
+                translate.y = top || 0
+            } else {
+                if (void 0 === top) {
+                    translate = getTranslate($element);
+                    translate.x = left || 0
+                } else {
+                    translate = {
+                        x: left || 0,
+                        y: top || 0,
+                        z: 0
+                    };
+                    cacheTranslate($element, translate)
+                }
+            }
+            $element.css({
+                transform: getTranslateCss(translate)
+            });
+            if (isPercentValue(left) || isPercentValue(top)) {
+                clearCache($element)
+            }
+        };
+        var isPercentValue = function(value) {
+            return "string" === type(value) && "%" === value[value.length - 1]
+        };
+        var getTranslate = function($element) {
+            var result = $element.length ? dataUtils.data($element.get(0), TRANSLATOR_DATA_KEY) : null;
+            if (!result) {
+                var transformValue = $element.css("transform") || getTranslateCss({
+                        x: 0,
+                        y: 0
+                    }),
+                    matrix = transformValue.match(TRANSFORM_MATRIX_REGEX),
+                    is3D = matrix && matrix[1];
+                if (matrix) {
+                    matrix = matrix[2].split(",");
+                    if ("3d" === is3D) {
+                        matrix = matrix.slice(12, 15)
+                    } else {
+                        matrix.push(0);
+                        matrix = matrix.slice(4, 7)
+                    }
+                } else {
+                    matrix = [0, 0, 0]
+                }
+                result = {
+                    x: parseFloat(matrix[0]),
+                    y: parseFloat(matrix[1]),
+                    z: parseFloat(matrix[2])
+                };
+                cacheTranslate($element, result)
+            }
+            return result
+        };
+        var cacheTranslate = function($element, translate) {
+            if ($element.length) {
+                dataUtils.data($element.get(0), TRANSLATOR_DATA_KEY, translate)
+            }
+        };
+        var clearCache = function($element) {
+            if ($element.length) {
+                dataUtils.removeData($element.get(0), TRANSLATOR_DATA_KEY)
+            }
+        };
+        var resetPosition = function($element, finishTransition) {
+            var originalTransition, stylesConfig = {
+                left: 0,
+                top: 0,
+                transform: "none"
+            };
+            if (finishTransition) {
+                originalTransition = $element.css("transition");
+                stylesConfig.transition = "none"
+            }
+            $element.css(stylesConfig);
+            clearCache($element);
+            if (finishTransition) {
+                $element.get(0).offsetHeight;
+                $element.css("transition", originalTransition)
+            }
+        };
+        var parseTranslate = function(translateString) {
+            var result = translateString.match(TRANSLATE_REGEX);
+            if (!result || !result[1]) {
+                return
+            }
+            result = result[1].split(",");
+            result = {
+                x: parseFloat(result[0]),
+                y: parseFloat(result[1]),
+                z: parseFloat(result[2])
+            };
+            return result
+        };
+        var getTranslateCss = function(translate) {
+            translate.x = translate.x || 0;
+            translate.y = translate.y || 0;
+            var xValueString = isPercentValue(translate.x) ? translate.x : translate.x + "px";
+            var yValueString = isPercentValue(translate.y) ? translate.y : translate.y + "px";
+            return "translate(" + xValueString + ", " + yValueString + ")"
+        };
+        exports.move = move;
+        exports.locate = locate;
+        exports.clearCache = clearCache;
+        exports.parseTranslate = parseTranslate;
+        exports.getTranslate = getTranslate;
+        exports.getTranslateCss = getTranslateCss;
+        exports.resetPosition = resetPosition
+    },
     /*!*************************************************!*\
       !*** ./artifacts/transpiled/core/utils/date.js ***!
       \*************************************************/
@@ -4378,6 +4514,14 @@
                 minutes: minutes
             }
         };
+        var roundDateByStartDayHour = function(date, startDayHour) {
+            var startTime = this.dateTimeFromDecimal(startDayHour),
+                result = new Date(date);
+            if (date.getHours() === startTime.hours && date.getMinutes() < startTime.minutes || date.getHours() < startTime.hours) {
+                result.setHours(startTime.hours, startTime.minutes, 0, 0)
+            }
+            return result
+        };
         var normalizeDate = function(date, min, max) {
             var normalizedDate = date;
             if (!isDefined(date)) {
@@ -4437,6 +4581,7 @@
             correctDateWithUnitBeginning: correctDateWithUnitBeginning,
             trimTime: trimTime,
             dateTimeFromDecimal: dateTimeFromDecimal,
+            roundDateByStartDayHour: roundDateByStartDayHour,
             addDateInterval: addDateInterval,
             addInterval: addInterval,
             getSequenceByInterval: getSequenceByInterval,
@@ -4477,144 +4622,22 @@
         };
         module.exports = dateUtils
     },
-    /*!******************************************************!*\
-      !*** ./artifacts/transpiled/animation/translator.js ***!
-      \******************************************************/
-    /*! dynamic exports provided */
-    /*! all exports used */
-    function(module, exports, __webpack_require__) {
-        var dataUtils = __webpack_require__( /*! ../core/element_data */ 38),
-            type = __webpack_require__( /*! ../core/utils/type */ 1).type;
-        var TRANSLATOR_DATA_KEY = "dxTranslator",
-            TRANSFORM_MATRIX_REGEX = /matrix(3d)?\((.+?)\)/,
-            TRANSLATE_REGEX = /translate(?:3d)?\((.+?)\)/;
-        var locate = function($element) {
-            var translate = getTranslate($element);
-            return {
-                left: translate.x,
-                top: translate.y
-            }
-        };
-        var move = function($element, position) {
-            var translate, left = position.left,
-                top = position.top;
-            if (void 0 === left) {
-                translate = getTranslate($element);
-                translate.y = top || 0
-            } else {
-                if (void 0 === top) {
-                    translate = getTranslate($element);
-                    translate.x = left || 0
-                } else {
-                    translate = {
-                        x: left || 0,
-                        y: top || 0,
-                        z: 0
-                    };
-                    cacheTranslate($element, translate)
-                }
-            }
-            $element.css({
-                transform: getTranslateCss(translate)
-            });
-            if (isPercentValue(left) || isPercentValue(top)) {
-                clearCache($element)
-            }
-        };
-        var isPercentValue = function(value) {
-            return "string" === type(value) && "%" === value[value.length - 1]
-        };
-        var getTranslate = function($element) {
-            var result = $element.length ? dataUtils.data($element.get(0), TRANSLATOR_DATA_KEY) : null;
-            if (!result) {
-                var transformValue = $element.css("transform") || getTranslateCss({
-                        x: 0,
-                        y: 0
-                    }),
-                    matrix = transformValue.match(TRANSFORM_MATRIX_REGEX),
-                    is3D = matrix && matrix[1];
-                if (matrix) {
-                    matrix = matrix[2].split(",");
-                    if ("3d" === is3D) {
-                        matrix = matrix.slice(12, 15)
-                    } else {
-                        matrix.push(0);
-                        matrix = matrix.slice(4, 7)
-                    }
-                } else {
-                    matrix = [0, 0, 0]
-                }
-                result = {
-                    x: parseFloat(matrix[0]),
-                    y: parseFloat(matrix[1]),
-                    z: parseFloat(matrix[2])
-                };
-                cacheTranslate($element, result)
-            }
-            return result
-        };
-        var cacheTranslate = function($element, translate) {
-            if ($element.length) {
-                dataUtils.data($element.get(0), TRANSLATOR_DATA_KEY, translate)
-            }
-        };
-        var clearCache = function($element) {
-            if ($element.length) {
-                dataUtils.removeData($element.get(0), TRANSLATOR_DATA_KEY)
-            }
-        };
-        var resetPosition = function($element, finishTransition) {
-            var originalTransition, stylesConfig = {
-                left: 0,
-                top: 0,
-                transform: "none"
-            };
-            if (finishTransition) {
-                originalTransition = $element.css("transition");
-                stylesConfig.transition = "none"
-            }
-            $element.css(stylesConfig);
-            clearCache($element);
-            if (finishTransition) {
-                $element.get(0).offsetHeight;
-                $element.css("transition", originalTransition)
-            }
-        };
-        var parseTranslate = function(translateString) {
-            var result = translateString.match(TRANSLATE_REGEX);
-            if (!result || !result[1]) {
-                return
-            }
-            result = result[1].split(",");
-            result = {
-                x: parseFloat(result[0]),
-                y: parseFloat(result[1]),
-                z: parseFloat(result[2])
-            };
-            return result
-        };
-        var getTranslateCss = function(translate) {
-            translate.x = translate.x || 0;
-            translate.y = translate.y || 0;
-            var xValueString = isPercentValue(translate.x) ? translate.x : translate.x + "px";
-            var yValueString = isPercentValue(translate.y) ? translate.y : translate.y + "px";
-            return "translate(" + xValueString + ", " + yValueString + ")"
-        };
-        exports.move = move;
-        exports.locate = locate;
-        exports.clearCache = clearCache;
-        exports.parseTranslate = parseTranslate;
-        exports.getTranslate = getTranslate;
-        exports.getTranslateCss = getTranslateCss;
-        exports.resetPosition = resetPosition
-    },
     /*!*********************************************!*\
       !*** ./artifacts/transpiled/core/config.js ***!
       \*********************************************/
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        var extendUtils = __webpack_require__( /*! ./utils/extend */ 0);
+        var _extend = __webpack_require__( /*! ./utils/extend */ 0);
+        var _extend2 = _interopRequireDefault(_extend);
+        var _errors = __webpack_require__( /*! ./errors */ 19);
+        var _errors2 = _interopRequireDefault(_errors);
+
+        function _interopRequireDefault(obj) {
+            return obj && obj.__esModule ? obj : {
+                "default": obj
+            }
+        }
         var config = {
             rtlEnabled: false,
             defaultCurrency: "USD",
@@ -4628,13 +4651,23 @@
             useLegacyStoreResult: false,
             useJQuery: void 0,
             editorStylingMode: void 0,
-            useLegacyVisibleIndex: false
+            useLegacyVisibleIndex: false,
+            optionsParser: function(optionsString) {
+                if ("{" !== optionsString.trim().charAt(0)) {
+                    optionsString = "{" + optionsString + "}"
+                }
+                try {
+                    return new Function("return " + optionsString)()
+                } catch (ex) {
+                    throw _errors2.default.Error("E3018", ex, optionsString)
+                }
+            }
         };
         var configMethod = function() {
             if (!arguments.length) {
                 return config
             }
-            extendUtils.extend(config, arguments[0])
+            _extend2.default.extend(config, arguments.length <= 0 ? void 0 : arguments[0])
         };
         if ("undefined" !== typeof DevExpress && DevExpress.config) {
             configMethod(DevExpress.config)
@@ -4650,7 +4683,7 @@
         var _support = __webpack_require__( /*! ../core/utils/support */ 43);
         var _support2 = _interopRequireDefault(_support);
         var _iterator = __webpack_require__( /*! ../core/utils/iterator */ 3);
-        var _browser = __webpack_require__( /*! ../core/utils/browser */ 35);
+        var _browser = __webpack_require__( /*! ../core/utils/browser */ 34);
         var _browser2 = _interopRequireDefault(_browser);
         var _devices = __webpack_require__( /*! ../core/devices */ 16);
         var _devices2 = _interopRequireDefault(_devices);
@@ -4756,7 +4789,11 @@
                     widgetName = inflector.camelize("dx-" + widgetName);
                     errors.log("W0001", "dxToolbar - 'widget' item field", deprecatedName, "16.1", "Use: '" + widgetName + "' instead")
                 }
-                widgetElement[widgetName](widgetOptions);
+                if (options.parent) {
+                    options.parent._createComponent(widgetElement, widgetName, widgetOptions)
+                } else {
+                    widgetElement[widgetName](widgetOptions)
+                }
                 return widgetElement
             }
             return $()
@@ -4830,8 +4867,7 @@
                 }.bind(this))
             },
             _extractTemplates: function() {
-                var templates = this.option("integrationOptions.templates"),
-                    templateElements = this.$element().contents().filter(TEMPLATE_SELECTOR);
+                var templateElements = this.$element().contents().filter(TEMPLATE_SELECTOR);
                 var templatesMap = {};
                 templateElements.each(function(_, template) {
                     var templateOptions = domUtils.getElementOptions(template).dxTemplate;
@@ -4848,9 +4884,13 @@
                 each(templatesMap, function(templateName, value) {
                     var deviceTemplate = this._findTemplateByDevice(value);
                     if (deviceTemplate) {
-                        templates[templateName] = this._createTemplate(deviceTemplate)
+                        this._saveTemplate(templateName, deviceTemplate)
                     }
                 }.bind(this))
+            },
+            _saveTemplate: function(name, template) {
+                var templates = this.option("integrationOptions.templates");
+                templates[name] = this._createTemplate(template)
             },
             _findTemplateByDevice: function(templates) {
                 var suitableTemplate = commonUtils.findBestMatches(devices.current(), templates, function(template) {
@@ -5018,8 +5058,14 @@
             _renderContent: function() {
                 var _this = this;
                 commonUtils.deferRender(function() {
+                    if (_this._disposed) {
+                        return
+                    }
                     return _this._renderContentImpl()
                 }).done(function() {
+                    if (_this._disposed) {
+                        return
+                    }
                     _this._fireContentReadyAction()
                 })
             },
@@ -5525,7 +5571,7 @@
             extend = __webpack_require__( /*! ../core/utils/extend */ 0).extend,
             typeUtils = __webpack_require__( /*! ../core/utils/type */ 1),
             iteratorUtils = __webpack_require__( /*! ../core/utils/iterator */ 3),
-            translator = __webpack_require__( /*! ./translator */ 24),
+            translator = __webpack_require__( /*! ./translator */ 23),
             easing = __webpack_require__( /*! ./easing */ 246),
             animationFrame = __webpack_require__( /*! ./frame */ 114),
             support = __webpack_require__( /*! ../core/utils/support */ 43),
@@ -6282,6 +6328,46 @@
         exports.underscore = underscore;
         exports.captionize = captionize
     }, ,
+    /*!****************************************************!*\
+      !*** ./artifacts/transpiled/core/utils/browser.js ***!
+      \****************************************************/
+    /*! dynamic exports provided */
+    /*! all exports used */
+    function(module, exports, __webpack_require__) {
+        var extend = __webpack_require__( /*! ./extend */ 0).extend,
+            windowUtils = __webpack_require__( /*! ./window */ 6),
+            navigator = windowUtils.getNavigator();
+        var webkitRegExp = /(webkit)[ \/]([\w.]+)/,
+            ieRegExp = /(msie) (\d{1,2}\.\d)/,
+            ie11RegExp = /(trident).*rv:(\d{1,2}\.\d)/,
+            msEdge = /(edge)\/((\d+)?[\w.]+)/,
+            safari = /(safari)/i,
+            mozillaRegExp = /(mozilla)(?:.*? rv:([\w.]+))/;
+        var browserFromUA = function(ua) {
+            ua = ua.toLowerCase();
+            var result = {},
+                matches = ieRegExp.exec(ua) || ie11RegExp.exec(ua) || msEdge.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || webkitRegExp.exec(ua) || [],
+                browserName = matches[1],
+                browserVersion = matches[2];
+            if ("webkit" === browserName && ua.indexOf("chrome") < 0 && safari.exec(ua)) {
+                browserName = "safari";
+                result.webkit = true;
+                browserVersion = /Version\/([0-9.]+)/i.exec(ua);
+                browserVersion = browserVersion && browserVersion[1]
+            }
+            if ("trident" === browserName || "edge" === browserName) {
+                browserName = "msie"
+            }
+            if (browserName) {
+                result[browserName] = true;
+                result.version = browserVersion
+            }
+            return result
+        };
+        module.exports = extend({
+            _fromUA: browserFromUA
+        }, browserFromUA(navigator.userAgent))
+    },
     /*!***************************************************!*\
       !*** ./artifacts/transpiled/localization/date.js ***!
       \***************************************************/
@@ -6446,46 +6532,6 @@
             }
         });
         module.exports = dateLocalization
-    },
-    /*!****************************************************!*\
-      !*** ./artifacts/transpiled/core/utils/browser.js ***!
-      \****************************************************/
-    /*! dynamic exports provided */
-    /*! all exports used */
-    function(module, exports, __webpack_require__) {
-        var extend = __webpack_require__( /*! ./extend */ 0).extend,
-            windowUtils = __webpack_require__( /*! ./window */ 6),
-            navigator = windowUtils.getNavigator();
-        var webkitRegExp = /(webkit)[ \/]([\w.]+)/,
-            ieRegExp = /(msie) (\d{1,2}\.\d)/,
-            ie11RegExp = /(trident).*rv:(\d{1,2}\.\d)/,
-            msEdge = /(edge)\/((\d+)?[\w.]+)/,
-            safari = /(safari)/i,
-            mozillaRegExp = /(mozilla)(?:.*? rv:([\w.]+))/;
-        var browserFromUA = function(ua) {
-            ua = ua.toLowerCase();
-            var result = {},
-                matches = ieRegExp.exec(ua) || ie11RegExp.exec(ua) || msEdge.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || webkitRegExp.exec(ua) || [],
-                browserName = matches[1],
-                browserVersion = matches[2];
-            if ("webkit" === browserName && ua.indexOf("chrome") < 0 && safari.exec(ua)) {
-                browserName = "safari";
-                result.webkit = true;
-                browserVersion = /Version\/([0-9.]+)/i.exec(ua);
-                browserVersion = browserVersion && browserVersion[1]
-            }
-            if ("trident" === browserName || "edge" === browserName) {
-                browserName = "msie"
-            }
-            if (browserName) {
-                result[browserName] = true;
-                result.version = browserVersion
-            }
-            return result
-        };
-        module.exports = extend({
-            _fromUA: browserFromUA
-        }, browserFromUA(navigator.userAgent))
     },
     /*!*********************************************!*\
       !*** ./artifacts/transpiled/data/errors.js ***!
@@ -7029,6 +7075,46 @@
         exports.stylePropPrefix = styleUtils.stylePropPrefix;
         exports.supportProp = supportProp;
         exports.inputType = inputType
+    },
+    /*!*******************************************!*\
+      !*** ./artifacts/transpiled/core/guid.js ***!
+      \*******************************************/
+    /*! dynamic exports provided */
+    /*! all exports used */
+    function(module, exports, __webpack_require__) {
+        var Class = __webpack_require__( /*! ./class */ 10);
+        var Guid = Class.inherit({
+            ctor: function(value) {
+                if (value) {
+                    value = String(value)
+                }
+                this._value = this._normalize(value || this._generate())
+            },
+            _normalize: function(value) {
+                value = value.replace(/[^a-f0-9]/gi, "").toLowerCase();
+                while (value.length < 32) {
+                    value += "0"
+                }
+                return [value.substr(0, 8), value.substr(8, 4), value.substr(12, 4), value.substr(16, 4), value.substr(20, 12)].join("-")
+            },
+            _generate: function() {
+                var value = "";
+                for (var i = 0; i < 32; i++) {
+                    value += Math.round(15 * Math.random()).toString(16)
+                }
+                return value
+            },
+            toString: function() {
+                return this._value
+            },
+            valueOf: function() {
+                return this._value
+            },
+            toJSON: function() {
+                return this._value
+            }
+        });
+        module.exports = Guid
     },
     /*!***************************************************!*\
       !*** ./artifacts/transpiled/core/utils/string.js ***!
@@ -8079,46 +8165,6 @@
             }
         });
         module.exports = CollectionWidget
-    },
-    /*!*******************************************!*\
-      !*** ./artifacts/transpiled/core/guid.js ***!
-      \*******************************************/
-    /*! dynamic exports provided */
-    /*! all exports used */
-    function(module, exports, __webpack_require__) {
-        var Class = __webpack_require__( /*! ./class */ 10);
-        var Guid = Class.inherit({
-            ctor: function(value) {
-                if (value) {
-                    value = String(value)
-                }
-                this._value = this._normalize(value || this._generate())
-            },
-            _normalize: function(value) {
-                value = value.replace(/[^a-f0-9]/gi, "").toLowerCase();
-                while (value.length < 32) {
-                    value += "0"
-                }
-                return [value.substr(0, 8), value.substr(8, 4), value.substr(12, 4), value.substr(16, 4), value.substr(20, 12)].join("-")
-            },
-            _generate: function() {
-                var value = "";
-                for (var i = 0; i < 32; i++) {
-                    value += Math.round(15 * Math.random()).toString(16)
-                }
-                return value
-            },
-            toString: function() {
-                return this._value
-            },
-            valueOf: function() {
-                return this._value
-            },
-            toJSON: function() {
-                return this._value
-            }
-        });
-        module.exports = Guid
     },
     /*!*****************************************************!*\
       !*** ./artifacts/transpiled/localization/number.js ***!
@@ -10721,9 +10767,9 @@
     /*! all exports used */
     function(module, exports, __webpack_require__) {
         var typeUtils = __webpack_require__( /*! ./core/utils/type */ 1),
-            dateUtils = __webpack_require__( /*! ./core/utils/date */ 23),
+            dateUtils = __webpack_require__( /*! ./core/utils/date */ 24),
             numberLocalization = __webpack_require__( /*! ./localization/number */ 49),
-            dateLocalization = __webpack_require__( /*! ./localization/date */ 34),
+            dateLocalization = __webpack_require__( /*! ./localization/date */ 35),
             dependencyInjector = __webpack_require__( /*! ./core/utils/dependency_injector */ 56);
         __webpack_require__( /*! ./localization/currency */ 147);
         module.exports = dependencyInjector({
@@ -11259,7 +11305,7 @@
             domAdapter = __webpack_require__( /*! ../core/dom_adapter */ 13),
             isWindow = __webpack_require__( /*! ../core/utils/type */ 1).isWindow,
             extend = __webpack_require__( /*! ../core/utils/extend */ 0).extend,
-            translator = __webpack_require__( /*! ./translator */ 24),
+            translator = __webpack_require__( /*! ./translator */ 23),
             support = __webpack_require__( /*! ../core/utils/support */ 43);
         var horzRe = /left|right/,
             vertRe = /top|bottom/,
@@ -14278,7 +14324,7 @@
             iteratorUtils = __webpack_require__( /*! ../../core/utils/iterator */ 3),
             each = __webpack_require__( /*! ../../core/utils/iterator */ 3).each,
             ajax = __webpack_require__( /*! ../../core/utils/ajax */ 76),
-            _Guid = __webpack_require__( /*! ../../core/guid */ 48),
+            _Guid = __webpack_require__( /*! ../../core/guid */ 44),
             isDefined = typeUtils.isDefined,
             isPlainObject = typeUtils.isPlainObject,
             grep = __webpack_require__( /*! ../../core/utils/common */ 4).grep,
@@ -14928,7 +14974,7 @@
     function(module, exports, __webpack_require__) {
         var extend = __webpack_require__( /*! ./extend */ 0).extend,
             consoleUtils = __webpack_require__( /*! ./console */ 84),
-            stringUtils = __webpack_require__( /*! ./string */ 44),
+            stringUtils = __webpack_require__( /*! ./string */ 45),
             version = __webpack_require__( /*! ../version */ 134);
         var ERROR_URL = "http://js.devexpress.com/error/" + version.split(".").slice(0, 2).join("_") + "/";
         module.exports = function(baseErrors, errors) {
@@ -15714,7 +15760,7 @@
             each = __webpack_require__( /*! ../../core/utils/iterator */ 3).each,
             version = __webpack_require__( /*! ../../core/version */ 134),
             _windowResizeCallbacks = __webpack_require__( /*! ../../core/utils/resize_callbacks */ 135),
-            _stringFormat = __webpack_require__( /*! ../../core/utils/string */ 44).format,
+            _stringFormat = __webpack_require__( /*! ../../core/utils/string */ 45).format,
             _isObject = __webpack_require__( /*! ../../core/utils/type */ 1).isObject,
             extend = __webpack_require__( /*! ../../core/utils/extend */ 0).extend,
             _floor = Math.floor,
@@ -16643,7 +16689,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             Class = __webpack_require__( /*! ../core/class */ 10),
             Callbacks = __webpack_require__( /*! ../core/utils/callbacks */ 21),
@@ -18071,12 +18117,9 @@
                     return
                 }
                 if (Array.isArray(sort)) {
-                    var cat = this.categories.map(function(item) {
-                        return item && item.valueOf()
-                    });
-                    this.categories = sort.filter(function(item) {
-                        return cat.indexOf(item && item.valueOf()) !== -1
-                    })
+                    this.categories = sort.slice(0).concat(this.categories.filter(function(item) {
+                        return item && sort.indexOf(item.valueOf()) === -1
+                    }))
                 } else {
                     var notAFunction = !_isFunction(sort);
                     if (notAFunction && "string" !== this.dataType) {
@@ -18932,13 +18975,13 @@
         DevExpress.createQueue = __webpack_require__( /*! ../../core/utils/queue */ 182).create;
         DevExpress.utils.dom = __webpack_require__( /*! ../../core/utils/dom */ 12);
         DevExpress.utils.common = __webpack_require__( /*! ../../core/utils/common */ 4);
-        DevExpress.utils.date = __webpack_require__( /*! ../../core/utils/date */ 23);
-        DevExpress.utils.browser = __webpack_require__( /*! ../../core/utils/browser */ 35);
+        DevExpress.utils.date = __webpack_require__( /*! ../../core/utils/date */ 24);
+        DevExpress.utils.browser = __webpack_require__( /*! ../../core/utils/browser */ 34);
         DevExpress.utils.inflector = __webpack_require__( /*! ../../core/utils/inflector */ 32);
         DevExpress.utils.iterator = __webpack_require__( /*! ../../core/utils/iterator */ 3);
         DevExpress.utils.resizeCallbacks = __webpack_require__( /*! ../../core/utils/resize_callbacks */ 135);
         DevExpress.utils.console = __webpack_require__( /*! ../../core/utils/console */ 84);
-        DevExpress.utils.string = __webpack_require__( /*! ../../core/utils/string */ 44);
+        DevExpress.utils.string = __webpack_require__( /*! ../../core/utils/string */ 45);
         DevExpress.utils.support = __webpack_require__( /*! ../../core/utils/support */ 43);
         DevExpress.processHardwareBackButton = __webpack_require__( /*! ../../mobile/process_hardware_back_button */ 245);
         DevExpress.viewPort = __webpack_require__( /*! ../../core/utils/view_port */ 66).value;
@@ -19074,7 +19117,7 @@
         var _type = __webpack_require__( /*! ../core/utils/type */ 1);
         var _config = __webpack_require__( /*! ../core/config */ 25);
         var _config2 = _interopRequireDefault(_config);
-        var _guid = __webpack_require__( /*! ../core/guid */ 48);
+        var _guid = __webpack_require__( /*! ../core/guid */ 44);
         var _guid2 = _interopRequireDefault(_guid);
         var _extend = __webpack_require__( /*! ../core/utils/extend */ 0);
         var _errors = __webpack_require__( /*! ./errors */ 36);
@@ -21463,7 +21506,7 @@
     /*! all exports used */
     function(module, exports, __webpack_require__) {
         var eventsEngine = __webpack_require__( /*! ../../events/core/events_engine */ 5),
-            browser = __webpack_require__( /*! ../../core/utils/browser */ 35),
+            browser = __webpack_require__( /*! ../../core/utils/browser */ 34),
             domAdapter = __webpack_require__( /*! ../../core/dom_adapter */ 13),
             Class = __webpack_require__( /*! ../../core/class */ 10),
             eventUtils = __webpack_require__( /*! ../utils */ 9);
@@ -21793,7 +21836,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             noop = __webpack_require__( /*! ../core/utils/common */ 4).noop,
             window = __webpack_require__( /*! ../core/utils/window */ 6).getWindow(),
@@ -24495,7 +24538,13 @@
             if (store.__rawData) {
                 continuation(store.__rawData)
             } else {
-                invokeUserLoad(store, userFuncOptions).done(function(rawData) {
+                var loadPromise = store.__rawDataPromise || invokeUserLoad(store, userFuncOptions);
+                if (store._cacheRawData) {
+                    store.__rawDataPromise = loadPromise
+                }
+                loadPromise.always(function() {
+                    delete store.__rawDataPromise
+                }).done(function(rawData) {
                     if (store._cacheRawData) {
                         store.__rawData = rawData
                     }
@@ -24875,7 +24924,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             errors = __webpack_require__( /*! ./errors */ 68),
             extend = __webpack_require__( /*! ../core/utils/extend */ 0).extend,
@@ -25006,7 +25055,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             MarkupComponent = __webpack_require__( /*! ./markup_component */ 186).MarkupComponent,
             isPlainObject = __webpack_require__( /*! ../../core/utils/type */ 1).isPlainObject,
@@ -25040,7 +25089,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             Class = __webpack_require__( /*! ../../core/class */ 10),
             extend = __webpack_require__( /*! ../../core/utils/extend */ 0).extend,
@@ -25437,7 +25486,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             domAdapter = __webpack_require__( /*! ../../core/dom_adapter */ 13),
             eventsEngine = __webpack_require__( /*! ../../events/core/events_engine */ 5),
@@ -27222,7 +27271,7 @@
             each = __webpack_require__( /*! ../core/utils/iterator */ 3).each,
             typeUtils = __webpack_require__( /*! ../core/utils/type */ 1),
             windowUtils = __webpack_require__( /*! ../core/utils/window */ 6),
-            translator = __webpack_require__( /*! ../animation/translator */ 24),
+            translator = __webpack_require__( /*! ../animation/translator */ 23),
             fitIntoRange = __webpack_require__( /*! ../core/utils/math */ 30).fitIntoRange,
             DOMComponent = __webpack_require__( /*! ../core/dom_component */ 59),
             eventUtils = __webpack_require__( /*! ../events/utils */ 9),
@@ -27563,7 +27612,7 @@
             callOnce = __webpack_require__( /*! ../../../core/utils/call_once */ 73),
             window = windowUtils.getWindow(),
             eventsEngine = __webpack_require__( /*! ../../../events/core/events_engine */ 5),
-            browser = __webpack_require__( /*! ../../../core/utils/browser */ 35),
+            browser = __webpack_require__( /*! ../../../core/utils/browser */ 34),
             getSvgMarkup = __webpack_require__( /*! ../../../core/utils/svg */ 208).getSvgMarkup,
             animation = __webpack_require__( /*! ./animation */ 711),
             math = Math,
@@ -32277,9 +32326,9 @@
     /*! all exports used */
     function(module, exports, __webpack_require__) {
         var typeUtils = __webpack_require__( /*! ../core/utils/type */ 1),
-            stringUtils = __webpack_require__( /*! ../core/utils/string */ 44),
+            stringUtils = __webpack_require__( /*! ../core/utils/string */ 45),
             numberFormatter = __webpack_require__( /*! ../localization/number */ 49),
-            dateLocalization = __webpack_require__( /*! ../localization/date */ 34),
+            dateLocalization = __webpack_require__( /*! ../localization/date */ 35),
             getDateLDMLFormat = __webpack_require__( /*! ../localization/ldml/date.format */ 201).getFormat,
             getLanguageID = __webpack_require__( /*! ../localization/language_codes */ 275).getLanguageId,
             UNSUPPORTED_FORMAT_MAPPING = {
@@ -33943,7 +33992,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             commonUtils = __webpack_require__( /*! ../../core/utils/common */ 4),
             window = __webpack_require__( /*! ../../core/utils/window */ 6).getWindow(),
@@ -34326,7 +34375,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var BACK_COMMAND_TITLE, $ = __webpack_require__( /*! jquery */ 29),
             Class = __webpack_require__( /*! ../core/class */ 10),
             window = __webpack_require__( /*! ../core/utils/window */ 6).getWindow(),
@@ -34789,7 +34838,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             location = __webpack_require__( /*! ../core/dom_adapter */ 13).getLocation(),
             dataCoreUtils = __webpack_require__( /*! ../core/utils/data */ 22),
@@ -34890,7 +34939,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../integration/jquery */ 46);
+        __webpack_require__( /*! ../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             Class = __webpack_require__( /*! ../core/class */ 10),
             Callbacks = __webpack_require__( /*! ../core/utils/callbacks */ 21),
@@ -35060,7 +35109,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             Class = __webpack_require__( /*! ../../core/class */ 10),
             noop = __webpack_require__( /*! ../../core/utils/common */ 4).noop,
@@ -35584,7 +35633,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        __webpack_require__( /*! ../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../integration/jquery */ 47);
         var $ = __webpack_require__( /*! jquery */ 29),
             version = __webpack_require__( /*! ../../core/version */ 134),
             window = __webpack_require__( /*! ../../core/utils/window */ 6).getWindow(),
@@ -36093,7 +36142,7 @@
         DevExpress.data.CustomStore = __webpack_require__( /*! ../../data/custom_store */ 173);
         DevExpress.data.LocalStore = __webpack_require__( /*! ../../data/local_store */ 382);
         DevExpress.data.base64_encode = __webpack_require__( /*! ../../data/utils */ 39).base64_encode;
-        DevExpress.data.Guid = __webpack_require__( /*! ../../core/guid */ 48);
+        DevExpress.data.Guid = __webpack_require__( /*! ../../core/guid */ 44);
         DevExpress.data.utils = {};
         DevExpress.data.utils.compileGetter = __webpack_require__( /*! ../../core/utils/data */ 22).compileGetter;
         DevExpress.data.utils.compileSetter = __webpack_require__( /*! ../../core/utils/data */ 22).compileSetter;
@@ -36354,7 +36403,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        var stringUtils = __webpack_require__( /*! ../../core/utils/string */ 44),
+        var stringUtils = __webpack_require__( /*! ../../core/utils/string */ 45),
             iteratorUtils = __webpack_require__( /*! ../../core/utils/iterator */ 3),
             odataUtils = __webpack_require__( /*! ./utils */ 103);
         __webpack_require__( /*! ./query_adapter */ 155);
@@ -36414,7 +36463,7 @@
     function(module, exports, __webpack_require__) {
         var DevExpress = __webpack_require__( /*! ../../../bundles/modules/core */ 133);
         DevExpress.framework = __webpack_require__( /*! ../../../bundles/modules/framework */ 344);
-        __webpack_require__( /*! ../../../integration/jquery */ 46);
+        __webpack_require__( /*! ../../../integration/jquery */ 47);
         __webpack_require__( /*! ../../../integration/angular */ 367);
         __webpack_require__( /*! ../../../integration/knockout */ 121);
         __webpack_require__( /*! ../../../localization/globalize/core */ 124);
@@ -39204,7 +39253,7 @@
                     }
                     bBox = getSizeItem(options, markerSize, labelBBox);
                     maxBBoxHeight = _max(maxBBoxHeight, bBox.height);
-                    that._createHint(dataItem, label);
+                    that._createHint(dataItem, label, marker);
                     return {
                         label: label,
                         labelBBox: labelBBox,
@@ -39284,11 +39333,12 @@
                     align: align
                 }).append(group)
             },
-            _createHint: function(data, label) {
+            _createHint: function(data, label, marker) {
                 var labelFormatObject = this._getCustomizeObject(data),
                     text = this._options.customizeHint.call(labelFormatObject, labelFormatObject);
                 if (_isDefined(text) && "" !== text) {
-                    label.setTitle(text)
+                    label.setTitle(text);
+                    marker.setTitle(text)
                 }
             },
             _createBackground: function() {
@@ -39775,12 +39825,11 @@
         }
 
         function parseAxisCategories(groupsData, parsers) {
-            var argumentCategories = groupsData.argumentOptions && groupsData.argumentOptions.categories,
-                valueParser = parsers[1];
-            groupsData.groups.forEach(function(valueGroup) {
+            var argumentCategories = groupsData.argumentOptions && groupsData.argumentOptions.categories;
+            groupsData.groups.forEach(function(valueGroup, i) {
                 var categories = valueGroup.valueOptions && valueGroup.valueOptions.categories;
                 if (categories) {
-                    valueGroup.valueOptions.categories = parseCategories(categories, valueParser)
+                    valueGroup.valueOptions.categories = parseCategories(categories, parsers[i + 1])
                 }
             });
             if (argumentCategories) {
@@ -39855,14 +39904,14 @@
                 categoryParsers = [argumentParser],
                 cache = {},
                 list = [];
-            groupsData.groups.forEach(function(group) {
+            groupsData.groups.forEach(function(group, groupIndex) {
                 group.series.forEach(function(series) {
                     ignoreEmptyPoints = series.getOptions().ignoreEmptyPoints;
                     valueParser = createParserUnit(group.valueType, group.valueAxisType, ignoreEmptyPoints, incidentOccurred);
                     sizeParser = createParserUnit(NUMERIC, CONTINUOUS, ignoreEmptyPoints, incidentOccurred);
                     cache[series.getArgumentField()] = argumentParser;
                     series.getValueFields().forEach(function(field) {
-                        !categoryParsers[1] && (categoryParsers[1] = valueParser);
+                        categoryParsers[groupIndex + 1] = valueParser;
                         cache[field] = valueParser
                     });
                     if (series.getSizeField()) {
@@ -41298,29 +41347,63 @@
             });
             return [_floor(closestCoord[0]), _floor(closestCoord[1])]
         }
+
+        function getCrossCoord(rect, coord, indexOffset) {
+            return (coord - rect[0 + indexOffset]) / (rect[2 + indexOffset] - rect[0 + indexOffset]) * (rect[3 - indexOffset] - rect[1 - indexOffset]) + rect[1 - indexOffset]
+        }
         var barPointStrategy = {
             isLabelInside: function(labelPoint, figure) {
                 var xc = labelPoint.x + labelPoint.width / 2,
                     yc = labelPoint.y + labelPoint.height / 2;
                 return figure.x <= xc && xc <= figure.x + figure.width && figure.y <= yc && yc <= figure.y + figure.height
             },
-            prepareLabelPoints: function(bBox, rotatedBBox, isHorizontal, angle) {
-                var x1 = rotatedBBox.x,
+            prepareLabelPoints: function(bBox, rotatedBBox, isHorizontal, angle, figureCenter) {
+                var labelPoints, x1 = rotatedBBox.x,
                     xc = x1 + rotatedBBox.width / 2,
                     x2 = x1 + rotatedBBox.width - 1,
                     y1 = rotatedBBox.y,
                     yc = y1 + rotatedBBox.height / 2,
-                    y2 = y1 + rotatedBBox.height - 1;
-                return _abs(angle) % 90 === 0 ? [
-                    [x1, y1],
-                    [isHorizontal ? x1 : xc, isHorizontal ? yc : y1],
-                    [x2, y1],
-                    [x1, y2],
-                    [isHorizontal ? x2 : xc, isHorizontal ? yc : y2],
-                    [x2, y2]
-                ] : [
-                    [xc, yc]
-                ]
+                    y2 = y1 + rotatedBBox.height - 1,
+                    isRectangular = _abs(angle) % 90 === 0;
+                if (figureCenter[0] > x1 && figureCenter[0] < x2) {
+                    if (isRectangular) {
+                        labelPoints = [
+                            [figureCenter[0], _abs(figureCenter[1] - y1) < _abs(figureCenter[1] - y2) ? y1 : y2]
+                        ]
+                    } else {
+                        labelPoints = [
+                            [figureCenter[0], getCrossCoord([x1, y1, x2, y2], figureCenter[0], 0)]
+                        ]
+                    }
+                } else {
+                    if (figureCenter[1] > y1 && figureCenter[1] < y2) {
+                        if (isRectangular) {
+                            labelPoints = [
+                                [_abs(figureCenter[0] - x1) < _abs(figureCenter[0] - x2) ? x1 : x2, figureCenter[1]]
+                            ]
+                        } else {
+                            labelPoints = [
+                                [getCrossCoord([x1, y1, x2, y2], figureCenter[1], 1), figureCenter[1]]
+                            ]
+                        }
+                    } else {
+                        if (isRectangular) {
+                            labelPoints = [
+                                [x1, y1],
+                                [isHorizontal ? x1 : xc, isHorizontal ? yc : y1],
+                                [x2, y1],
+                                [x1, y2],
+                                [isHorizontal ? x2 : xc, isHorizontal ? yc : y2],
+                                [x2, y2]
+                            ]
+                        } else {
+                            labelPoints = [
+                                [xc, yc]
+                            ]
+                        }
+                    }
+                }
+                return labelPoints
             },
             isHorizontal: function(bBox, figure) {
                 return bBox.x > figure.x + figure.width || bBox.x + bBox.width < figure.x
@@ -41642,8 +41725,9 @@
                     points = [];
                 if (!strategy.isLabelInside(bBox, figure, "inside" !== options.position)) {
                     isHorizontal = strategy.isHorizontal(bBox, figure);
-                    points = strategy.prepareLabelPoints(bBox, rotatedBBox, isHorizontal, -options.rotationAngle || 0);
-                    labelPoint = getClosestCoord(strategy.getFigureCenter(figure), points);
+                    var figureCenter = strategy.getFigureCenter(figure);
+                    points = strategy.prepareLabelPoints(bBox, rotatedBBox, isHorizontal, -options.rotationAngle || 0, figureCenter);
+                    labelPoint = getClosestCoord(figureCenter, points);
                     points = strategy.findFigurePoint(figure, labelPoint, isHorizontal);
                     points = points.concat(labelPoint)
                 }
@@ -41736,7 +41820,7 @@
         var _range = __webpack_require__( /*! ../translators/range */ 128);
         var _tick = __webpack_require__( /*! ./tick */ 452);
         var _math2 = __webpack_require__( /*! ../../core/utils/math */ 30);
-        var _date = __webpack_require__( /*! ../../core/utils/date */ 23);
+        var _date = __webpack_require__( /*! ../../core/utils/date */ 24);
         var _common = __webpack_require__( /*! ../../core/utils/common */ 4);
         var _xy_axes = __webpack_require__( /*! ./xy_axes */ 453);
         var _xy_axes2 = _interopRequireDefault(_xy_axes);
@@ -42725,7 +42809,7 @@
                 }
                 return center
             },
-            setBusinessRange: function(range, categoriesOrder, oppositeVisualRangeUpdateMode, axisReinitialized) {
+            setBusinessRange: function(range, axisReinitialized, oppositeVisualRangeUpdateMode) {
                 var that = this;
                 var options = that._options;
                 var isDiscrete = options.type === _axes_constants2.default.discrete;
@@ -42758,14 +42842,10 @@
                 }
                 that._seriesData.minVisible = void 0 === that._seriesData.minVisible ? that._seriesData.min : that._seriesData.minVisible;
                 that._seriesData.maxVisible = void 0 === that._seriesData.maxVisible ? that._seriesData.max : that._seriesData.maxVisible;
-                if (that.isArgumentAxis) {
-                    that._seriesData.sortCategories(categoriesOrder)
-                } else {
-                    if (options.showZero) {
-                        that._seriesData.correctValueZeroLevel()
-                    }
-                    that._seriesData.sortCategories(that.getCategoriesSorter())
+                if (!that.isArgumentAxis && options.showZero) {
+                    that._seriesData.correctValueZeroLevel()
                 }
+                that._seriesData.sortCategories(that.getCategoriesSorter());
                 that._breaks = that._getScaleBreaks(options, that._seriesData, that._series, that.isArgumentAxis);
                 that._translator.updateBusinessRange(that.adjustViewport(that._seriesData))
             },
@@ -43012,7 +43092,7 @@
                             maxVisible = ticks[length - 1].value
                         }
                     }
-                    interval = that._calculateRangeInterval(that.calculateInterval(maxVisible, minVisible), interval);
+                    interval = that._calculateRangeInterval(interval);
                     range.addRange({
                         minVisible: minVisible,
                         maxVisible: maxVisible,
@@ -43036,7 +43116,7 @@
                 var bound = isEnd ? wholeRange.endValue : wholeRange.startValue;
                 return !this.isArgumentAxis || !(0, _type.isDefined)(bound) && this.isExtremePosition(isEnd)
             },
-            _calculateRangeInterval: function(dataLength, interval) {
+            _calculateRangeInterval: function(interval) {
                 var isDateTime = "datetime" === this._options.dataType,
                     minArgs = [],
                     addToArgs = function(value) {
@@ -43100,10 +43180,8 @@
                     }
                     if (!(0, _type.isDefined)(minValueMargin) || !(0, _type.isDefined)(maxValueMargin)) {
                         if (isArgumentAxis && margins.checkInterval) {
-                            if (0 === maxMinDistance) {
-                                interval = 0
-                            } else {
-                                interval = that._calculateRangeInterval(maxMinDistance, range.interval);
+                            if (0 !== maxMinDistance) {
+                                interval = that._calculateRangeInterval(range.interval);
                                 marginValue = interval / 2
                             }
                         }
@@ -43829,7 +43907,7 @@
             adjust = __webpack_require__( /*! ../../core/utils/math */ 30).adjust,
             _abs = Math.abs,
             CANVAS_PROP = ["width", "height", "left", "top", "bottom", "right"],
-            addInterval = __webpack_require__( /*! ../../core/utils/date */ 23).addInterval;
+            addInterval = __webpack_require__( /*! ../../core/utils/date */ 24).addInterval;
         var dummyTranslator = {
             to: function(value) {
                 var coord = this._canvasOptions.startPoint + (this._options.conversionValue ? value : Math.round(value));
@@ -44180,7 +44258,7 @@
             getInterval: function() {
                 var canvasOptions = this._canvasOptions;
                 var interval = this._businessRange.interval;
-                if (interval) {
+                if (isFinite(interval)) {
                     return Math.round(canvasOptions.ratioOfCanvasRange * interval)
                 }
                 return Math.round(canvasOptions.endPoint - canvasOptions.startPoint)
@@ -44935,7 +45013,7 @@
             typeUtils = __webpack_require__( /*! ../core/utils/type */ 1),
             extend = __webpack_require__( /*! ../core/utils/extend */ 0).extend,
             errors = __webpack_require__( /*! ../ui/widget/ui.errors */ 18),
-            stringUtils = __webpack_require__( /*! ../core/utils/string */ 44),
+            stringUtils = __webpack_require__( /*! ../core/utils/string */ 45),
             JSZip = __webpack_require__( /*! jszip */ 328),
             fileSaver = __webpack_require__( /*! ./file_saver */ 233),
             excelFormatConverter = __webpack_require__( /*! ./excel_format_converter */ 237),
@@ -46507,7 +46585,7 @@
         var core = __webpack_require__( /*! ./localization/core */ 86);
         var message = __webpack_require__( /*! ./localization/message */ 14);
         var number = __webpack_require__( /*! ./localization/number */ 49);
-        var date = __webpack_require__( /*! ./localization/date */ 34);
+        var date = __webpack_require__( /*! ./localization/date */ 35);
         __webpack_require__( /*! ./localization/currency */ 147);
         exports.locale = core.locale.bind(core);
         exports.loadMessages = message.load.bind(message);
@@ -46794,7 +46872,6 @@
             "en-AI": "en-001",
             "en-AU": "en-001",
             "en-BB": "en-001",
-            "en-BE": "en-001",
             "en-BM": "en-001",
             "en-BS": "en-001",
             "en-BW": "en-001",
@@ -46876,6 +46953,7 @@
             "en-ZM": "en-001",
             "en-ZW": "en-001",
             "en-AT": "en-150",
+            "en-BE": "en-150",
             "en-CH": "en-150",
             "en-DE": "en-150",
             "en-DK": "en-150",
@@ -46908,6 +46986,7 @@
             "pt-AO": "pt-PT",
             "pt-CH": "pt-PT",
             "pt-CV": "pt-PT",
+            "pt-FR": "pt-PT",
             "pt-GQ": "pt-PT",
             "pt-GW": "pt-PT",
             "pt-LU": "pt-PT",
@@ -46917,23 +46996,43 @@
             "pt-TL": "pt-PT",
             "az-Arab": "root",
             "az-Cyrl": "root",
+            "blt-Latn": "root",
             "bm-Nkoo": "root",
             "bs-Cyrl": "root",
+            "byn-Latn": "root",
+            "cu-Glag": "root",
+            "dje-Arab": "root",
+            "dyo-Arab": "root",
             "en-Dsrt": "root",
             "en-Shaw": "root",
+            "ff-Adlm": "root",
+            "ff-Arab": "root",
             "ha-Arab": "root",
             "iu-Latn": "root",
+            "kk-Arab": "root",
+            "ku-Arab": "root",
+            "ky-Arab": "root",
+            "ky-Latn": "root",
+            "ml-Arab": "root",
             "mn-Mong": "root",
             "ms-Arab": "root",
             "pa-Arab": "root",
+            "sd-Deva": "root",
+            "sd-Khoj": "root",
+            "sd-Sind": "root",
             "shi-Latn": "root",
+            "so-Arab": "root",
             "sr-Latn": "root",
+            "sw-Arab": "root",
+            "tg-Arab": "root",
+            "ug-Cyrl": "root",
             "uz-Arab": "root",
             "uz-Cyrl": "root",
             "vai-Latn": "root",
-            "zh-Hant": "root",
+            "wo-Arab": "root",
+            "yo-Arab": "root",
             "yue-Hans": "root",
-            "ff-Adlm": "root",
+            "zh-Hant": "root",
             "zh-Hant-MO": "zh-Hant-HK"
         }
     },
@@ -47016,7 +47115,7 @@
             registerComponentCallbacks = __webpack_require__( /*! ../../core/component_registrator_callbacks */ 148),
             Widget = __webpack_require__( /*! ../../ui/widget/ui.widget */ 28),
             KoTemplate = __webpack_require__( /*! ./template */ 250),
-            Editor = __webpack_require__( /*! ../../ui/editor/editor */ 45),
+            Editor = __webpack_require__( /*! ../../ui/editor/editor */ 46),
             Locker = __webpack_require__( /*! ../../core/utils/locker */ 251),
             config = __webpack_require__( /*! ../../core/config */ 25);
         var LOCKS_DATA_KEY = "dxKoLocks",
@@ -47337,7 +47436,7 @@
             navigator = windowUtils.getNavigator(),
             eventsEngine = __webpack_require__( /*! ../../events/core/events_engine */ 5),
             fx = __webpack_require__( /*! ../../animation/fx */ 31),
-            translator = __webpack_require__( /*! ../../animation/translator */ 24),
+            translator = __webpack_require__( /*! ../../animation/translator */ 23),
             compareVersions = __webpack_require__( /*! ../../core/utils/version */ 61).compare,
             viewPortUtils = __webpack_require__( /*! ../../core/utils/view_port */ 66),
             extend = __webpack_require__( /*! ../../core/utils/extend */ 0).extend,
@@ -47352,7 +47451,7 @@
             typeUtils = __webpack_require__( /*! ../../core/utils/type */ 1),
             each = __webpack_require__( /*! ../../core/utils/iterator */ 3).each,
             devices = __webpack_require__( /*! ../../core/devices */ 16),
-            browser = __webpack_require__( /*! ../../core/utils/browser */ 35),
+            browser = __webpack_require__( /*! ../../core/utils/browser */ 34),
             registerComponent = __webpack_require__( /*! ../../core/component_registrator */ 8),
             Widget = __webpack_require__( /*! ../widget/ui.widget */ 28),
             KeyboardProcessor = __webpack_require__( /*! ../widget/ui.keyboard_processor */ 168),
@@ -48970,14 +49069,15 @@
             registerEventCallbacks.add(function(name, eventObject) {
                 jQuery.event.special[name] = eventObject
             });
-            var passiveListenerEventName = eventsEngine.passiveListenerEvents.nativeEventName;
-            jQuery.event.special[passiveListenerEventName] = {
-                setup: function(data, namespaces, handler) {
-                    domAdapter.listen(this, passiveListenerEventName, handler, {
-                        passive: false
-                    })
+            eventsEngine.forcePassiveFalseEventNames.forEach(function(eventName) {
+                jQuery.event.special[eventName] = {
+                    setup: function(data, namespaces, handler) {
+                        domAdapter.listen(this, eventName, handler, {
+                            passive: false
+                        })
+                    }
                 }
-            };
+            });
             eventsEngine.set({
                 on: function(element) {
                     jQuery(element).on.apply(jQuery(element), Array.prototype.slice.call(arguments, 1))
@@ -49110,7 +49210,7 @@
     function(module, exports, __webpack_require__) {
         var angular = __webpack_require__( /*! angular */ 260);
         if (angular) {
-            __webpack_require__( /*! ./jquery */ 46);
+            __webpack_require__( /*! ./jquery */ 47);
             __webpack_require__( /*! ./angular/component_registrator */ 368);
             __webpack_require__( /*! ./angular/event_registrator */ 375);
             __webpack_require__( /*! ./angular/components */ 376);
@@ -49150,13 +49250,13 @@
         var _locker2 = _interopRequireDefault(_locker);
         var _ui = __webpack_require__( /*! ../../ui/widget/ui.widget */ 28);
         var _ui2 = _interopRequireDefault(_ui);
-        var _editor = __webpack_require__( /*! ../../ui/editor/editor */ 45);
+        var _editor = __webpack_require__( /*! ../../ui/editor/editor */ 46);
         var _editor2 = _interopRequireDefault(_editor);
         var _template = __webpack_require__( /*! ./template */ 369);
         var _template2 = _interopRequireDefault(_template);
         var _module = __webpack_require__( /*! ./module */ 189);
         var _module2 = _interopRequireDefault(_module);
-        var _uiCollection_widget = __webpack_require__( /*! ../../ui/collection/ui.collection_widget.edit */ 47);
+        var _uiCollection_widget = __webpack_require__( /*! ../../ui/collection/ui.collection_widget.edit */ 48);
         var _uiCollection_widget2 = _interopRequireDefault(_uiCollection_widget);
         var _data = __webpack_require__( /*! ../../core/utils/data */ 22);
         var _data2 = _interopRequireDefault(_data);
@@ -49706,7 +49806,7 @@
             iteratorUtils = __webpack_require__( /*! ../../core/utils/iterator */ 3),
             isFunction = __webpack_require__( /*! ../../core/utils/type */ 1).isFunction,
             Action = __webpack_require__( /*! ../../core/action */ 81),
-            Guid = __webpack_require__( /*! ../../core/guid */ 48),
+            Guid = __webpack_require__( /*! ../../core/guid */ 44),
             domUtils = __webpack_require__( /*! ../../core/utils/dom */ 12),
             dataUtils = __webpack_require__( /*! ../../core/utils/data */ 22),
             Widget = __webpack_require__( /*! ../widget/ui.widget */ 28),
@@ -49873,8 +49973,8 @@
             },
             _prepareItemTemplate: function($item) {
                 var templateId = ITEM_TEMPLATE_ID_PREFIX + new Guid;
-                var templateOptions = 'dxTemplate: { name: "' + templateId + '" }';
-                $item.detach().clone().attr("data-options", templateOptions).data("options", templateOptions).appendTo(this.$element());
+                var $template = $item.detach().clone().removeAttr("data-options").addClass(TEMPLATE_WRAPPER_CLASS);
+                this._saveTemplate(templateId, $template);
                 return templateId
             },
             _dataSourceOptions: function() {
@@ -51949,7 +52049,7 @@
         };
         var ACCEPTABLE_JSON_FORMAT_PROPERTIES = ["skeleton", "date", "time", "datetime", "raw"];
         var Globalize = __webpack_require__( /*! globalize */ 70),
-            dateLocalization = __webpack_require__( /*! ../date */ 34),
+            dateLocalization = __webpack_require__( /*! ../date */ 35),
             isObject = __webpack_require__( /*! ../../core/utils/type */ 1).isObject,
             inArray = __webpack_require__( /*! ../../core/utils/array */ 11).inArray,
             iteratorUtils = __webpack_require__( /*! ../../core/utils/iterator */ 3);
@@ -54972,12 +55072,12 @@
                     });
                     if (!updatedAxis || updatedAxis && groupSeries.length && valueAxis === updatedAxis) {
                         valueAxis.setGroupSeries(groupSeries);
-                        valueAxis.setBusinessRange(groupRange, void 0, that._argumentAxes[0]._lastVisualRangeUpdateMode, that._axesReinitialized)
+                        valueAxis.setBusinessRange(groupRange, that._axesReinitialized, that._argumentAxes[0]._lastVisualRangeUpdateMode)
                     }
                 });
                 if (!updatedAxis || updatedAxis && series.length) {
                     that._argumentAxes.forEach(function(a) {
-                        return a.setBusinessRange(argRange, that._groupsData.categories, void 0, that._axesReinitialized)
+                        return a.setBusinessRange(argRange, that._axesReinitialized)
                     })
                 }
                 that._axesReinitialized = false;
@@ -55110,7 +55210,7 @@
         var _format_helper = __webpack_require__( /*! ../../format_helper */ 75);
         var _format_helper2 = _interopRequireDefault(_format_helper);
         var _type = __webpack_require__( /*! ../../core/utils/type */ 1);
-        var _date = __webpack_require__( /*! ../../core/utils/date */ 23);
+        var _date = __webpack_require__( /*! ../../core/utils/date */ 24);
         var _date2 = _interopRequireDefault(_date);
         var _math = __webpack_require__( /*! ../../core/utils/math */ 30);
         var _utils = __webpack_require__( /*! ../core/utils */ 15);
@@ -55446,7 +55546,7 @@
     /*! all exports used */
     function(module, exports, __webpack_require__) {
         var _utils = __webpack_require__( /*! ../core/utils */ 15);
-        var _date = __webpack_require__( /*! ../../core/utils/date */ 23);
+        var _date = __webpack_require__( /*! ../../core/utils/date */ 24);
         var _date2 = _interopRequireDefault(_date);
         var _type = __webpack_require__( /*! ../../core/utils/type */ 1);
         var _math = __webpack_require__( /*! ../../core/utils/math */ 30);
@@ -56383,7 +56483,7 @@
         var _range = __webpack_require__( /*! ../translators/range */ 128);
         var _range2 = _interopRequireDefault(_range);
         var _format_helper = __webpack_require__( /*! ../../format_helper */ 75);
-        var _date = __webpack_require__( /*! ../../core/utils/date */ 23);
+        var _date = __webpack_require__( /*! ../../core/utils/date */ 24);
         var _date2 = _interopRequireDefault(_date);
         var _extend = __webpack_require__( /*! ../../core/utils/extend */ 0);
         var _datetime_breaks = __webpack_require__( /*! ./datetime_breaks */ 742);
@@ -61539,7 +61639,7 @@
                 });
                 that._argumentAxes.forEach(function(axis) {
                     axis.updateCanvas(that._canvas);
-                    axis.setBusinessRange(viewport, void 0, void 0, that._axesReinitialized)
+                    axis.setBusinessRange(viewport, that._axesReinitialized)
                 });
                 that.callBase()
             },
@@ -61653,6 +61753,7 @@
                 if (!sizeShortage || !panesCanvases) {
                     return
                 }
+                this._renderer.stopAllAnimations();
                 var that = this,
                     rotated = that._isRotated(),
                     extendedArgAxes = (that._scrollBar ? [that._scrollBar] : []).concat(that._argumentAxes),
@@ -69216,7 +69317,7 @@
         var typeUtils = __webpack_require__( /*! ../../core/utils/type */ 1),
             isNumber = typeUtils.isNumeric,
             isDefined = typeUtils.isDefined,
-            dateUtils = __webpack_require__( /*! ../../core/utils/date */ 23),
+            dateUtils = __webpack_require__( /*! ../../core/utils/date */ 24),
             addInterval = dateUtils.addInterval,
             dateToMilliseconds = dateUtils.dateToMilliseconds,
             floor = Math.floor,
@@ -69251,7 +69352,7 @@
                 return that.to(bp, direction, interval)
             },
             getInterval: function() {
-                return Math.round(this._canvasOptions.ratioOfCanvasRange * (this._businessRange.interval || Math.abs(this._canvasOptions.rangeMax - this._canvasOptions.rangeMin)))
+                return Math.round(this._canvasOptions.ratioOfCanvasRange * (isFinite(this._businessRange.interval) && this._businessRange.interval || Math.abs(this._canvasOptions.rangeMax - this._canvasOptions.rangeMin)))
             },
             zoom: function() {},
             getMinScale: function() {},
@@ -69353,7 +69454,7 @@
         module.exports = {
             _fromValue: parse,
             _toValue: parse,
-            _add: __webpack_require__( /*! ../../core/utils/date */ 23).addDateInterval
+            _add: __webpack_require__( /*! ../../core/utils/date */ 24).addDateInterval
         }
     },
     /*!************************************************************************!*\
@@ -69399,7 +69500,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        var dateUtils = __webpack_require__( /*! ../../core/utils/date */ 23),
+        var dateUtils = __webpack_require__( /*! ../../core/utils/date */ 24),
             days = [0, 1, 2, 3, 4, 5, 6];
 
         function getWeekendDays(workdays) {
@@ -73493,7 +73594,7 @@
                     text = that._renderer.text(_getSampleText(that._translator, context.formatOptions), 0, 0).attr(context.textOptions).css(context.fontStyles).append(that._barsGroup);
                     bBox = text.getBBox();
                     text.remove();
-                    context.textVerticalOffset = -bBox.y - bBox.height / 2;
+                    context.textY = bBox.y;
                     context.textWidth = bBox.width;
                     context.textHeight = bBox.height
                 }
@@ -73506,7 +73607,9 @@
                 };
                 if (this._context.textEnabled) {
                     result.horizontalMargin = this._context.textWidth;
-                    result.verticalMargin = this._context.textHeight
+                    result.verticalMargin = this._context.textHeight;
+                    result.inverseHorizontalMargin = this._context.textWidth / 2;
+                    result.inverseVerticalMargin = this._context.textHeight / 2
                 }
                 return result
             },
@@ -73547,7 +73650,8 @@
                 _count = _min(_floor((radius + spacing) / context.barSize), count);
                 that._setBarsCount(_count);
                 radius = that._outerRadius;
-                context.textRadius = radius + that._textIndent;
+                context.textRadius = radius;
+                context.textIndent = that._textIndent;
                 that._palette.reset();
                 unitOffset = context.barSize + spacing;
                 for (i = 0; i < _count; ++i, radius -= unitOffset) {
@@ -73725,7 +73829,7 @@
                 });
                 if (context.textEnabled) {
                     that._line.attr({
-                        points: [context.x, context.y - that._settings.innerRadius, context.x, context.y - context.textRadius],
+                        points: [context.x, context.y - that._settings.innerRadius, context.x, context.y - context.textRadius - context.textIndent],
                         stroke: context.lineColor || options.color
                     }).sharp();
                     that._text.css({
@@ -73746,25 +73850,42 @@
                 }
             },
             setAngle: function(angle) {
-                var cosSin, that = this;
+                var cosSin, that = this,
+                    context = that._context,
+                    settings = that._settings;
                 that._angle = angle;
-                setAngles(that._settings, that._context.baseAngle, that._angle);
-                that._bar.attr(that._settings);
-                that._tracker.attr(that._settings);
-                if (that._context.textEnabled) {
-                    var text = _formatValue(that._value, that._context.formatOptions, {
+                setAngles(settings, context.baseAngle, angle);
+                that._bar.attr(settings);
+                that._tracker.attr(settings);
+                if (context.textEnabled) {
+                    cosSin = _getCosAndSin(angle);
+                    var indent = context.textIndent,
+                        radius = context.textRadius + indent,
+                        x = context.x + radius * cosSin.cos,
+                        y = context.y - radius * cosSin.sin,
+                        halfWidth = .5 * context.textWidth,
+                        textHeight = context.textHeight,
+                        textY = context.textY;
+                    if (_abs(x - context.x) > indent) {
+                        x += x < context.x ? -halfWidth : halfWidth
+                    }
+                    if (_abs(y - context.y) <= indent) {
+                        y -= textY + .5 * textHeight
+                    } else {
+                        y -= y < context.y ? textY + textHeight : textY
+                    }
+                    var text = _formatValue(that._value, context.formatOptions, {
                         index: that._index
+                    });
+                    that._text.attr({
+                        text: text,
+                        x: x,
+                        y: y
                     });
                     that._line.attr({
                         visibility: "" === text ? "hidden" : null
                     });
-                    that._line.rotate(_convertAngleToRendererSpace(that._angle), that._context.x, that._context.y);
-                    cosSin = _getCosAndSin(that._angle);
-                    that._text.attr({
-                        text: text,
-                        x: that._context.x + (that._context.textRadius + .6 * that._context.textWidth) * cosSin.cos,
-                        y: that._context.y - (that._context.textRadius + .6 * that._context.textHeight) * cosSin.sin + that._context.textVerticalOffset
-                    })
+                    that._line.rotate(_convertAngleToRendererSpace(angle), context.x, context.y)
                 }
                 return that
             },
@@ -73870,7 +73991,7 @@
             extend = __webpack_require__( /*! ../../core/utils/extend */ 0).extend,
             each = __webpack_require__( /*! ../../core/utils/iterator */ 3).each,
             vizUtils = __webpack_require__( /*! ../core/utils */ 15),
-            dateUtils = __webpack_require__( /*! ../../core/utils/date */ 23),
+            dateUtils = __webpack_require__( /*! ../../core/utils/date */ 24),
             adjust = __webpack_require__( /*! ../../core/utils/math */ 30).adjust,
             addInterval = dateUtils.addInterval,
             dateToMilliseconds = dateUtils.dateToMilliseconds,
@@ -74772,7 +74893,7 @@
                 var axis = this._axis;
                 axis.updateOptions(prepareAxisOptions(options, isCompactMode, canvas.height, canvas.height / 2 - Math.ceil(options.width / 2)));
                 axis.validate();
-                axis.setBusinessRange(businessRange, void 0, void 0, true);
+                axis.setBusinessRange(businessRange, true);
                 if (void 0 !== seriesDataSource && seriesDataSource.isShowChart()) {
                     axis.setMarginOptions(seriesDataSource.getMarginOptions(canvas))
                 }
@@ -74787,7 +74908,7 @@
                 axis.drawScaleBreaks({
                     start: canvas.top,
                     end: canvas.top + canvas.height
-                });
+                })
             },
             visualRange: function() {},
             getViewport: function() {
@@ -75042,6 +75163,11 @@
                 var that = this;
                 var translator = that._params.translator;
                 var businessRange = translator.getBusinessRange();
+                var compare = "discrete" === businessRange.axisType ? function(a, b) {
+                    return a < b
+                } : function(a, b) {
+                    return a <= b
+                };
                 var _vizUtils$adjustVisua = vizUtils.adjustVisualRange({
                         dataType: businessRange.dataType,
                         axisType: businessRange.axisType,
@@ -75059,7 +75185,7 @@
                     endValue = _vizUtils$adjustVisua.endValue;
                 startValue = isNumeric(startValue) ? adjust(startValue) : startValue;
                 endValue = isNumeric(endValue) ? adjust(endValue) : endValue;
-                var values = translator.to(startValue, -1) < translator.to(endValue, 1) ? [startValue, endValue] : [endValue, startValue];
+                var values = compare(translator.to(startValue, -1), translator.to(endValue, 1)) ? [startValue, endValue] : [endValue, startValue];
                 that._sliders[0].setDisplayValue(values[0]);
                 that._sliders[1].setDisplayValue(values[1]);
                 that._sliders[0]._position = translator.to(values[0], -1);
@@ -82438,7 +82564,7 @@
     /*! dynamic exports provided */
     /*! all exports used */
     function(module, exports, __webpack_require__) {
-        module.exports = __webpack_require__( /*! c:\Projects\DevExtreme\18.2\BuildLabel\Temp\DevExtreme.v18.2\repo\GitHub\artifacts\transpiled\bundles\dx.viz.js */ 828)
+        module.exports = __webpack_require__( /*! c:\Projects\DevExtreme\18.2\Build\Temp\DevExtreme.v18.2\repo\GitHub\artifacts\transpiled\bundles\dx.viz.js */ 828)
     },
     /*!************************************************!*\
       !*** ./artifacts/transpiled/bundles/dx.viz.js ***!
