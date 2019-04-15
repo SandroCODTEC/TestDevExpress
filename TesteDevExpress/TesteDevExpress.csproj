@@ -18,6 +18,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\Sale\" />
+  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties DismissedDevExtremeVersion="18.2.8-pre-19091" />
